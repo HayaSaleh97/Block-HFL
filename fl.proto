@@ -1,0 +1,47 @@
+syntax = "proto3";
+package fl;
+
+service FederatedLearning {
+  // Client -> Server: send local update
+  rpc SendModelUpdate      (ModelUpdate)   returns (Response) {}
+  // Orchestrator -> Server: clear stored updates
+  rpc Clear                (Empty)         returns (Response) {}
+  // Orchestrator -> Server: fetch raw client updates
+  rpc GetClientUpdates     (Empty)         returns (ClientUpdates) {}
+  // Leader -> Server: aggregate stored updates
+  rpc Aggregate            (Empty)         returns (ModelUpdate) {}
+  // Leader -> Loser: propagate final global model
+  rpc PropagateGlobalModel (ModelUpdate)   returns (Response) {}
+  // Client -> Server: fetch global model
+  rpc GetGlobalModel       (Empty)         returns (ModelUpdate) {}
+  
+  // New methods for getting timing metrics
+  rpc GetAggregationTime   (Empty)         returns (DoubleValue) {}
+  rpc GetBCSubmissionTime  (Empty)         returns (DoubleValue) {}
+  
+  // NEW: Server reports its aggregation accuracy
+  rpc ReportAccuracy       (Empty)         returns (DoubleValue) {}
+  
+  rpc SetBlockchainStorage   (DoubleValue)    returns (Response) {}
+
+}
+
+message ModelUpdate {
+  int32 client_id = 1;
+  repeated float weights = 2;
+}
+
+message ClientUpdates {
+  repeated ModelUpdate updates = 1;
+}
+
+message Response {
+  string message = 1;
+}
+
+message Empty {}
+
+// Double value message for returning timing metrics
+message DoubleValue {
+  double value = 1;
+}

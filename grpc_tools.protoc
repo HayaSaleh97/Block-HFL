@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package federated_learning;
+
+service FederatedLearning {
+  // Client sends weights and receives aggregated weights
+  rpc ShareWeights (ClientWeights) returns (AggregatedWeights) {}
+  
+  // Initial connection for a client
+  rpc InitializeConnection (ClientInfo) returns (AggregatedWeights) {}
+}
+
+message ClientInfo {
+  int32 client_id = 1;
+  repeated float initial_weights = 2;
+}
+
+message ClientWeights {
+  int32 client_id = 1;
+  repeated float weights = 2;
+  int32 round_number = 3;
+}
+
+message AggregatedWeights {
+  repeated float weights = 1;
+  int32 round_number = 2;
+  bool training_complete = 3;
+}
